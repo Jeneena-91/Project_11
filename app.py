@@ -12,65 +12,54 @@ df.columns = [re.sub(r'(?<!^)(?=[A-Z])', '_', col).replace(" ", "_").lower() for
 df.drop(columns=["unnamed:_0", "zipcode"], inplace=True, errors='ignore')
 df.dropna(subset=['latitude', 'longitude'], inplace=True)
 df.info()
+
 st.header('Sightseeing USA, Tourist Destinations')
 st.write("""
          #### Filter the data below based on tourist spots
          # """)
 
+states = df['state'].unique()
+categories = sorted(df['category'].dropna().unique()) if 'category' in df.columns else []
+
 # ----------------------------
-# Sidebar - Step 1: State Selection
+# Sidebar Filters
 # ----------------------------
 st.sidebar.title("Tour Planner Filters")
 
-states = df['state'].dropna().unique()
 selected_state = st.sidebar.selectbox("Choose a State", sorted(states))
 
-# ----------------------------
-# Filter State Data
-# ----------------------------
-state_df = df[df['state'] == selected_state].copy()
-
-# ----------------------------
-# Sidebar  Select Categories in That State
-# ----------------------------
-if 'category' in state_df.columns:
-    categories = sorted(state_df['categories'].dropna().unique())
+if categories:
     selected_categories = st.sidebar.multiselect("Select Categories", categories, default=categories[:2])
 else:
     selected_categories = None
 
-# ----------------------------
-# Apply Category Filter
-# ----------------------------
-if selected_categories:
-    state_df = state_df[state_df['categories'].isin(selected_categories)]
-
-# ----------------------------
-#  Display and Let User Select Start Point
-# ----------------------------
-top_destinations = (
-    state_df
-    .sort_values(by='weighted__score', ascending=False)
-    .reset_index(drop=True)
-)
-
-st.title("Tourist Route Optimizer")
-st.markdown(f"### Top Tourist Spots in **{selected_state}**")
-if selected_categories:
-    st.markdown(f"**Categories:** {', '.join(selected_categories)}")
-
-st.dataframe(top_destinations[['name', 'city', 'categories', 'rating']].head(20))
-
-start_point_name = st.selectbox("Select Your Starting Point", top_destinations['name'].unique())
-
-# ----------------------------
-# Sidebar : Set Route Size Limits
-# ----------------------------
-max_locations = st.sidebar.slider("Specify the number of locations to visit.", min_value=2, max_value=10, value=9)
+max_locations = st.sidebar.slider("Total Locations to Choose From", min_value=5, max_value=10, value=9)
 num_stops = st.sidebar.slider("Number of Route Stops", min_value=2, max_value=max_locations, value=6)
 
 # ----------------------------
-# Build Route Starting From User Selection
+# Filter Data Based on Selections
+# ----------------------------
+filtered_df = df[df['state'] == selected_state]
+
+if selected_categories:
+    filtered_df = filtered_df[filtered_df['category'].isin(selected_categories)]
+
+top_n_destinations = (
+    filtered_df
+    .sort_values('weighted__score', ascending=False)
+    .head(max_locations)
+    .reset_index(drop=True)
+)
+
+if len(top_n_destinations) < num_stops:
+    st.warning("Not enough locations available for the number of stops selected.")
+    st.stop()
+
+selected_stops = top_n_destinations.iloc[:num_stops]
+# Let user choose starting point
+start_point_name = st.selectbox("Choose your starting point", top_n_destinations['name'])
+
+## Build Route Starting From User Selection
 # ----------------------------
 def build_route(df, start_name, num_stops):
     start = df[df['name'] == start_name].iloc[0]
@@ -81,10 +70,10 @@ def build_route(df, start_name, num_stops):
     selected = pd.concat([pd.DataFrame([start]), selected]).reset_index(drop=True)
     return selected
 
-selected_stops = build_route(top_destinations.head(max_locations), start_point_name, num_stops)
+selected_stops = build_route(top_n_destinations.head(max_locations), start_point_name, num_stops)
 
 # ----------------------------
-# Step 5: Optimize Route with Nearest Neighbor (from chosen start)
+#  Optimize Route with Nearest Neighbor (from chosen start)
 # ----------------------------
 def nearest_neighbor_route(df, start_name):
     visited = []
