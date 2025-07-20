@@ -29,11 +29,11 @@ st.sidebar.title("Tour Planner Filters")
 selected_state = st.sidebar.selectbox("Choose a State", sorted(states))
 
 if categories:
-    selected_categories = st.sidebar.multiselect("Select Categories", categories, default=categories[:2])
+    selected_categories = st.sidebar.multiselect("Select Categories", categories, default=categories)
 else:
     selected_categories = None
 
-max_locations = st.sidebar.slider("Total Locations to Choose From", min_value=5, max_value=10, value=9)
+max_locations = st.sidebar.slider("Total Locations to Choose From", min_value=2, max_value=10, value=9)
 num_stops = st.sidebar.slider("Number of Route Stops", min_value=2, max_value=max_locations, value=6)
 
 # ----------------------------
@@ -57,7 +57,7 @@ if len(top_n_destinations) < num_stops:
 
 selected_stops = top_n_destinations.iloc[:num_stops]
 # Let user choose starting point
-start_point_name = st.selectbox("Choose your starting point", top_n_destinations['name'])
+start_point_name = st.sidebar.selectbox("Choose your starting point", top_n_destinations['name'])
 
 ## Build Route Starting From User Selection
 # ----------------------------
