@@ -15,8 +15,8 @@ df= df.drop_duplicates(subset='address')
 
 st.header('Route Optimizer')
 st.write("""
-         #### Upon user selection of a state and the desired number of destinations, the application filters and retrieves the top-rated (most popular) destinations within the selected state. The user is then prompted to select a starting point from the resulting destination list.  Based on these inputs, calculate and display the optimized travel route, total distance, estimated travel time, and the ordered list of stops.
-         #### """)
+         #### Once you choose a state and how many places you’d like to visit, the app will find the most popular destinations in that area. You'll then pick a starting point from that list. Based on your choices, the app will calculate the best travel route, including the total distance, estimated travel time, and the order in which to visit each stop.
+         #""")
 
 states = df['state'].unique()
 categories = sorted(df['category'].dropna().unique()) if 'category' in df.columns else []
