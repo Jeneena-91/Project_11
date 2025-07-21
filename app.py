@@ -11,7 +11,7 @@ df =  pd.read_csv("Tourist destinations.xls")
 df.columns = [re.sub(r'(?<!^)(?=[A-Z])', '_', col).replace(" ", "_").lower() for col in df.columns]
 df.drop(columns=["unnamed:_0", "zipcode"], inplace=True, errors='ignore')
 df.dropna(subset=['latitude', 'longitude'], inplace=True)
-
+df= df.drop_duplicates(subset='address')
 
 st.header('Route Optimizer')
 st.write("""
