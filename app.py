@@ -28,15 +28,7 @@ st.sidebar.title("Tour Planner Filters")
 selected_state = st.sidebar.selectbox("Choose a State", sorted(states))
 
 if categories:
-    with st.sidebar:
-     st.subheader("Category Filter")
-     selected_categories = st.multiselect(
-        "Select Categories",
-        options=categories,
-        default=categories,
-        help="All categories are selected by default. Uncheck to filter."
-    )
-
+    selected_categories = st.sidebar.multiselect("Select Categories", categories, default=categories)
 else:
     selected_categories = None
 
