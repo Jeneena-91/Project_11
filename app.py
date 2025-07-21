@@ -15,7 +15,7 @@ df.dropna(subset=['latitude', 'longitude'], inplace=True)
 
 st.header('Route Optimizer')
 st.write("""
-         #### Allow the user to filter the data by selecting a state, number of destinations, preferred categories, and a starting point. Based on these inputs, calculate and display the optimized travel route, total distance, estimated travel time, and the ordered list of stops.
+         #### Upon user selection of a state and the desired number of destinations, the application filters and retrieves the top-rated (most popular) destinations within the selected state. The user is then prompted to select a starting point from the resulting destination list.  Based on these inputs, calculate and display the optimized travel route, total distance, estimated travel time, and the ordered list of stops.
          #### """)
 
 states = df['state'].unique()
