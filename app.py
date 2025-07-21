@@ -29,11 +29,18 @@ st.sidebar.title("Tour Planner Filters")
 selected_state = st.sidebar.selectbox("Choose a State", sorted(states))
 
 if categories:
-    selected_categories = st.sidebar.multiselect("Select Categories", categories, default=categories)
+    with st.sidebar:
+    st.subheader("Category Filter")
+    selected_categories = st.multiselect(
+        "Select Categories",
+        options=categories,
+        default=categories,
+        help="All categories are selected by default. Uncheck to filter."
+    )
 else:
     selected_categories = None
 
-max_locations = st.sidebar.slider("Total Locations to Choose From", min_value=2, max_value=10, value=9)
+max_locations = st.sidebar.slider("How many destinations would you like to visit?", min_value=2, max_value=10, value=9)
 num_stops = st.sidebar.slider("Number of Route Stops", min_value=2, max_value=max_locations, value=6)
 
 # ----------------------------
@@ -149,4 +156,4 @@ st.markdown(f"**Total Distance:** {total_km:.2f} km")
 st.markdown(f"**Estimated Driving Time:** {total_hr:.2f} hours")
 
 st.markdown("### Route Details")
-st.dataframe(optimized_route[['name', 'city','address', 'categories', 'rating']])
+st.dataframe(optimized_route[['name', 'city','address', 'categories', 'rating']]).reset_index(drop=True)
